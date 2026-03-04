@@ -1,0 +1,23 @@
+{
+	order caddyscope after basicauth
+	http_port 2080
+	metrics {
+		per_host
+	}
+}
+
+:2080 {
+	caddyscope /dashboard {
+		username admin
+		# Generate with: caddy hash-password (password: admin)
+		password $2a$14$hZKMKHEkwOyh3jCnJRNYVubBSCcZaMSw8VIeRn61HFe37nLGz/RAO
+	}
+}
+
+http://app.127.0.0.1.nip.io:2080 {
+	reverse_proxy localhost:3000
+}
+
+http://api.127.0.0.1.nip.io:2080 {
+	reverse_proxy localhost:8082
+}

@@ -1,0 +1,401 @@
+/* caddyscope custom styles — uses Kelp CSS variables for light/dark support */
+
+/* Header */
+.cs-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--color-border-muted);
+}
+
+.cs-header h1 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+/* Header health indicators */
+.cs-header-health {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.cs-health-count-ok {
+    color: #22c55e;
+}
+
+.cs-health-count-err {
+    color: #ef4444;
+}
+
+/* Theme toggle — push right together with connection dot */
+.cs-theme-toggle {
+    margin-left: auto;
+    padding: 0.25rem 0.625rem;
+    border: 1px solid var(--color-border-accent);
+    border-radius: 0.375rem;
+    background: var(--color-fill-muted);
+    color: var(--color-on-muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+
+/* Connection status dot */
+.cs-connection-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.cs-connection-dot.connected {
+    background: #22c55e;
+    animation: cs-pulse 2s infinite;
+}
+
+.cs-connection-dot.disconnected {
+    background: #ef4444;
+}
+
+@keyframes cs-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Main layout */
+.cs-main {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+/* Summary bar */
+.cs-summary {
+    display: flex;
+    gap: 2rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border-muted);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    background: var(--color-fill-muted);
+    color: var(--color-text-normal);
+}
+
+.cs-summary-item {
+    font-size: 0.875rem;
+}
+
+/* Warning banner */
+.cs-warning {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border-accent);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    background: var(--color-fill-muted);
+    color: var(--color-text-normal);
+    font-size: 0.875rem;
+}
+
+/* Controls */
+.cs-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.cs-filter-input {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--color-border-vivid);
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.25;
+    flex: 1;
+    min-width: 200px;
+    background: var(--color-background);
+    color: var(--color-text-input);
+    box-sizing: border-box;
+}
+
+.cs-filter-input::placeholder {
+    color: var(--color-text-muted);
+}
+
+.cs-sort-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.cs-sort-buttons button {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--color-border-accent);
+    border-radius: 0.375rem;
+    background: var(--color-fill-muted);
+    color: var(--color-on-muted);
+    font-size: 0.875rem;
+    line-height: 1.25;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.cs-sort-buttons button.active {
+    background: var(--color-fill-vivid);
+    color: var(--color-on-vivid);
+    border-color: var(--color-fill-vivid);
+}
+
+/* Vhost table */
+.cs-vhost-table {
+    margin-bottom: 1rem;
+}
+
+.cs-vhost-table th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+
+.cs-vhost-row {
+    cursor: pointer;
+}
+
+.cs-vhost-row:hover {
+    background: var(--color-fill-accent);
+}
+
+.cs-vhost-host {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    white-space: nowrap;
+}
+
+.cs-vhost-metric {
+    font-size: 0.8125rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.cs-sparkline {
+    display: inline-block;
+    width: 80px;
+    height: 24px;
+    vertical-align: middle;
+}
+
+.cs-sparkline svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Detail drawer */
+.cs-drawer {
+    --width: 36rem;
+}
+
+.cs-drawer-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--color-border-muted);
+}
+
+.cs-drawer-header button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    padding: 0.25rem;
+}
+
+.cs-drawer-body {
+    padding: 1.25rem;
+    overflow-y: auto;
+}
+
+/* Upstreams */
+.cs-upstreams {
+    margin-bottom: 1rem;
+}
+
+.cs-upstreams ul {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.cs-upstreams li {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+}
+
+/* Health dots */
+.cs-health-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.cs-health-dot.healthy {
+    background: #22c55e;
+}
+
+.cs-health-dot.unhealthy {
+    background: #ef4444;
+}
+
+/* Metrics grid */
+.cs-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.375rem;
+    margin-bottom: 0.75rem;
+}
+
+.cs-metric {
+    text-align: center;
+    padding: 0.25rem 0.375rem;
+    border-radius: 0.25rem;
+    border: 1px solid var(--color-border-muted);
+}
+
+.cs-metric-label {
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.125rem;
+}
+
+.cs-metric-value {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Metric color accents — match graph colors */
+.cs-metric-rps  { background: color-mix(in srgb, #3b82f6 8%, var(--color-background)); border-color: color-mix(in srgb, #3b82f6 25%, var(--color-border-muted)); }
+.cs-metric-rps .cs-metric-label  { color: #3b82f6; }
+.cs-metric-err  { background: color-mix(in srgb, #ef4444 8%, var(--color-background)); border-color: color-mix(in srgb, #ef4444 25%, var(--color-border-muted)); }
+.cs-metric-err .cs-metric-label  { color: #ef4444; }
+.cs-metric-p50  { background: color-mix(in srgb, #22c55e 8%, var(--color-background)); border-color: color-mix(in srgb, #22c55e 25%, var(--color-border-muted)); }
+.cs-metric-p50 .cs-metric-label  { color: #22c55e; }
+.cs-metric-p95  { background: color-mix(in srgb, #f59e0b 8%, var(--color-background)); border-color: color-mix(in srgb, #f59e0b 25%, var(--color-border-muted)); }
+.cs-metric-p95 .cs-metric-label  { color: #f59e0b; }
+.cs-metric-p99  { background: color-mix(in srgb, #ef4444 8%, var(--color-background)); border-color: color-mix(in srgb, #ef4444 25%, var(--color-border-muted)); }
+.cs-metric-p99 .cs-metric-label  { color: #ef4444; }
+
+/* Chart labels */
+.cs-chart-label {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    margin-top: 0.75rem;
+}
+
+/* Latency chart */
+.cs-latency-chart {
+    margin: 0.25rem 0 0;
+    min-height: 180px;
+}
+
+.cs-latency-chart svg {
+    width: 100%;
+    display: block;
+}
+
+/* Rate / Error charts */
+.cs-rate-chart,
+.cs-error-chart {
+    margin: 0.25rem 0 0;
+    min-height: 120px;
+}
+
+.cs-rate-chart svg,
+.cs-error-chart svg {
+    width: 100%;
+    display: block;
+}
+
+/* Status code badges */
+.cs-status-codes {
+    margin-top: 0.5rem;
+}
+
+.cs-badge-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-top: 0.5rem;
+}
+
+.cs-badge {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.cs-badge-healthy { background: color-mix(in srgb, #22c55e 15%, var(--color-background)); color: #22c55e; }
+.cs-badge-unhealthy { background: color-mix(in srgb, #ef4444 15%, var(--color-background)); color: #ef4444; }
+.cs-badge-2xx { background: color-mix(in srgb, #22c55e 15%, var(--color-background)); color: #22c55e; }
+.cs-badge-3xx { background: color-mix(in srgb, #3b82f6 15%, var(--color-background)); color: #3b82f6; }
+.cs-badge-4xx { background: color-mix(in srgb, #f59e0b 15%, var(--color-background)); color: #f59e0b; }
+.cs-badge-5xx { background: color-mix(in srgb, #ef4444 15%, var(--color-background)); color: #ef4444; }
+
+/* Skeleton loading */
+.cs-skeleton-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.cs-skeleton {
+    background: linear-gradient(90deg, var(--color-fill-muted) 25%, var(--color-border-muted) 50%, var(--color-fill-muted) 75%);
+    background-size: 200% 100%;
+    animation: cs-shimmer 1.5s infinite;
+    border-radius: 0.5rem;
+}
+
+.cs-skeleton-bar {
+    height: 3rem;
+}
+
+.cs-skeleton-card {
+    height: 4.5rem;
+}
+
+@keyframes cs-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Empty state */
+.cs-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--color-text-muted);
+}

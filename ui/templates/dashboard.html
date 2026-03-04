@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base-path" content="{{.Path}}">
+    <title>caddyscope</title>
+    <link rel="stylesheet" href="{{.Path}}/static/kelp-1.17.2.css">
+    <link rel="stylesheet" href="{{.Path}}/static/style.css">
+    <script type="module" src="{{.Path}}/static/kelp-1.17.2.js"></script>
+    <script src="{{.Path}}/static/dark-mode-auto-1.17.2.js"></script>
+    <script defer src="{{.Path}}/static/alpine-3.15.8.min.js"></script>
+    <script type="module">
+      import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+      window.Plot = Plot;
+    </script>
+    <script src="{{.Path}}/static/app.js"></script>
+</head>
+<body x-data>
+    <header class="cs-header">
+        <h1>caddyscope</h1>
+        <template x-if="$store.dashboard.timestamp">
+            <span class="cs-header-health">
+                <span class="cs-health-dot healthy"></span>
+                <span class="cs-health-count-ok" x-text="$store.dashboard.healthyCounts.healthy"></span>
+                <span class="cs-health-dot unhealthy"></span>
+                <span class="cs-health-count-err" x-text="$store.dashboard.healthyCounts.unhealthy"></span>
+            </span>
+        </template>
+        <button class="cs-theme-toggle" @click="$store.dashboard.cycleTheme()" x-text="$store.dashboard.themeLabel"></button>
+        <span class="cs-connection-dot" :class="$store.dashboard.connected ? 'connected' : 'disconnected'" :title="$store.dashboard.connected ? 'Connected' : 'Disconnected'"></span>
+    </header>
+
+    <main class="cs-main">
+        <!-- Summary bar -->
+        <div class="cs-summary" x-show="$store.dashboard.timestamp">
+            <div class="cs-summary-item">
+                <strong x-text="$store.dashboard.filteredStats.length"></strong> hosts
+            </div>
+            <div class="cs-summary-item">
+                <strong x-text="$store.dashboard.filteredStats.reduce((a, s) => a + s.rate, 0).toFixed(1)"></strong> req/s total
+            </div>
+            <div class="cs-summary-item">
+                Updated <span x-text="$store.dashboard.timestamp ? new Date($store.dashboard.timestamp).toLocaleTimeString() : ''"></span>
+            </div>
+        </div>
+
+        <!-- Warnings -->
+        <template x-for="msg in $store.dashboard.warnings" :key="msg">
+            <div class="cs-warning" x-text="msg"></div>
+        </template>
+
+        <!-- Skeleton loading -->
+        <template x-if="!$store.dashboard.timestamp">
+            <div class="cs-skeleton-container">
+                <div class="cs-skeleton cs-skeleton-bar"></div>
+                <div class="cs-skeleton cs-skeleton-card"></div>
+                <div class="cs-skeleton cs-skeleton-card"></div>
+                <div class="cs-skeleton cs-skeleton-card"></div>
+            </div>
+        </template>
+
+        <!-- Controls -->
+        <div class="cs-controls" x-show="$store.dashboard.timestamp">
+            <input type="text" class="cs-filter-input" placeholder="Filter hosts..." x-model="$store.dashboard.filter">
+            <div class="cs-sort-buttons">
+                <button :class="{ active: $store.dashboard.sortBy === 'host' }" @click="$store.dashboard.toggleSort('host')">
+                    Host <span x-show="$store.dashboard.sortBy === 'host'" x-text="$store.dashboard.sortAsc ? '\u2191' : '\u2193'"></span>
+                </button>
+                <button :class="{ active: $store.dashboard.sortBy === 'rate' }" @click="$store.dashboard.toggleSort('rate')">
+                    Req/s <span x-show="$store.dashboard.sortBy === 'rate'" x-text="$store.dashboard.sortAsc ? '\u2191' : '\u2193'"></span>
+                </button>
+<button :class="{ active: $store.dashboard.sortBy === 'duration_p95' }" @click="$store.dashboard.toggleSort('duration_p95')">
+                    p95 <span x-show="$store.dashboard.sortBy === 'duration_p95'" x-text="$store.dashboard.sortAsc ? '\u2191' : '\u2193'"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Vhost table -->
+        <table class="table-striped cs-vhost-table" x-show="$store.dashboard.timestamp">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Host</th>
+                    <th>p50</th>
+                    <th>p95</th>
+                    <th>Req/s</th>
+                    <th>Err%</th>
+                    <th>p95 trend</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="s in $store.dashboard.filteredStats" :key="s.host">
+                    <tr class="cs-vhost-row" @click="$store.dashboard.openDrawer(s.host)">
+                        <td>
+                            <span class="cs-health-dot"
+                                  :class="(s.upstreams.length === 0 || s.upstreams.every(u => u.healthy)) ? 'healthy' : 'unhealthy'">
+                            </span>
+                        </td>
+                        <td class="cs-vhost-host" x-text="s.host"></td>
+                        <td class="cs-vhost-metric" x-text="(s.duration_p50 * 1000).toFixed(1) + 'ms'"></td>
+                        <td class="cs-vhost-metric" x-text="(s.duration_p95 * 1000).toFixed(1) + 'ms'"></td>
+                        <td class="cs-vhost-metric" x-text="s.rate.toFixed(1)"></td>
+                        <td class="cs-vhost-metric" x-text="s.errorRate.toFixed(1) + '%'"></td>
+                        <td>
+                            <span class="cs-sparkline"
+                                  x-effect="$store.dashboard.renderSparkline(s.host, $el)">
+                            </span>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+
+        <!-- Empty state -->
+        <div class="cs-empty" x-show="$store.dashboard.timestamp && $store.dashboard.filteredStats.length === 0">
+            <p>No hosts match your filter.</p>
+        </div>
+    </main>
+
+    <!-- Detail drawer -->
+    <dialog class="drawer cs-drawer" id="cs-detail-drawer"
+            @click="if ($event.target === $el) $store.dashboard.closeDrawer()"
+            x-effect="$store.dashboard.selectedHost ? $el.showModal() : ($el.open && $el.close())">
+        <template x-if="$store.dashboard.selectedStat">
+            <div class="action-body" x-data="{ s: $store.dashboard.selectedStat }">
+                <div class="action-header cs-drawer-header">
+                    <div>
+                        <span class="cs-health-dot"
+                              :class="(s.upstreams.length === 0 || s.upstreams.every(u => u.healthy)) ? 'healthy' : 'unhealthy'">
+                        </span>
+                        <strong x-text="s.host"></strong>
+                    </div>
+                    <div>
+                        <button @click="$store.dashboard.closeDrawer()">&times;</button>
+                    </div>
+                </div>
+                <div class="cs-drawer-body">
+                    <!-- Upstreams -->
+                    <div class="cs-upstreams" x-show="s.upstreams.length > 0">
+                        <strong>Upstreams</strong>
+                        <ul>
+                            <template x-for="u in s.upstreams" :key="u.address">
+                                <li>
+                                    <span class="cs-health-dot" :class="u.healthy ? 'healthy' : 'unhealthy'"></span>
+                                    <span x-text="u.address"></span>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+
+                    <!-- Metrics grid -->
+                    <div class="cs-metrics-grid">
+                        <div class="cs-metric cs-metric-rps">
+                            <div class="cs-metric-label">Req/s</div>
+                            <div class="cs-metric-value" x-text="s.rate.toFixed(1)"></div>
+                        </div>
+                        <div class="cs-metric cs-metric-err">
+                            <div class="cs-metric-label">Err%</div>
+                            <div class="cs-metric-value" x-text="s.errorRate.toFixed(1) + '%'"></div>
+                        </div>
+                        <div class="cs-metric cs-metric-p50">
+                            <div class="cs-metric-label">p50</div>
+                            <div class="cs-metric-value" x-text="(s.duration_p50 * 1000).toFixed(1) + 'ms'"></div>
+                        </div>
+                        <div class="cs-metric cs-metric-p95">
+                            <div class="cs-metric-label">p95</div>
+                            <div class="cs-metric-value" x-text="(s.duration_p95 * 1000).toFixed(1) + 'ms'"></div>
+                        </div>
+                        <div class="cs-metric cs-metric-p99">
+                            <div class="cs-metric-label">p99</div>
+                            <div class="cs-metric-value" x-text="(s.duration_p99 * 1000).toFixed(1) + 'ms'"></div>
+                        </div>
+                    </div>
+
+                    <!-- Latency chart -->
+                    <strong class="cs-chart-label">Latency</strong>
+                    <div class="cs-latency-chart"
+                         x-effect="$store.dashboard.renderChart(s.host, $el)">
+                    </div>
+
+                    <!-- Req/s chart -->
+                    <strong class="cs-chart-label">Req/s</strong>
+                    <div class="cs-rate-chart"
+                         x-effect="$store.dashboard.renderRateChart(s.host, $el)">
+                    </div>
+
+                    <!-- Error rate chart -->
+                    <strong class="cs-chart-label">Error Rate</strong>
+                    <div class="cs-error-chart"
+                         x-effect="$store.dashboard.renderErrorChart(s.host, $el)">
+                    </div>
+
+                    <!-- Status codes -->
+                    <div class="cs-status-codes" x-show="Object.keys(s.status_codes).length > 0">
+                        <strong>Status Codes</strong>
+                        <div class="cs-badge-list">
+                            <template x-for="code in Object.keys(s.status_codes).sort()" :key="code">
+                                <span class="cs-badge"
+                                      :class="'cs-badge-' + code.charAt(0) + 'xx'"
+                                      x-text="code + ': ' + Math.round(s.status_codes[code]).toLocaleString()">
+                                </span>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </dialog>
+</body>
+</html>
