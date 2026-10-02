@@ -1,0 +1,49 @@
+# docker stack deploy -c docs/swarm/stack-static.yml caddy
+#
+# Generate the hash with `caddy hash-password` and write every `$` as `$$`.
+
+services:
+  caddy:
+    image: your-registry/caddy:latest
+    command: ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      CADDYSCOPE_PASSWORD_HASH: "$$2a$$14$$hZKMKHEkwOyh3jCnJRNYVubBSCcZaMSw8VIeRn61HFe37nLGz/RAO"
+    configs:
+      - source: caddyfile
+        target: /etc/caddy/Caddyfile
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - web
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+  app:
+    image: traefik/whoami
+    command: ["--port", "3000"]
+    networks:
+      - web
+
+  api:
+    image: traefik/whoami
+    command: ["--port", "8080"]
+    networks:
+      - web
+
+configs:
+  caddyfile:
+    file: ./Caddyfile
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  web:
+    driver: overlay
