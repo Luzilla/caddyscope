@@ -1,0 +1,25 @@
+{
+    email ops@example.com
+    metrics {
+        per_host
+    }
+}
+
+scope.example.com {
+    caddyscope /dashboard {
+        username admin
+        password {$CADDYSCOPE_PASSWORD_HASH}
+        refresh  5s
+    }
+}
+
+app.example.com {
+    reverse_proxy app:3000
+}
+
+api.example.com {
+    reverse_proxy api:8080 {
+        health_uri /healthz
+        health_interval 10s
+    }
+}
