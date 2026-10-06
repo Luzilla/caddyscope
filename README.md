@@ -11,6 +11,8 @@ metrics, and upstream health.
 - pushes updates over server-sent events, no polling
 - protected by basic auth (bcrypt)
 
+![caddyscope dashboard](docs/caddyscope.png)
+
 ## Install
 
 ```sh
