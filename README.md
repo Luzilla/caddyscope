@@ -4,7 +4,7 @@ A Caddy module that serves a live dashboard of your virtual hosts, request
 metrics, and upstream health.
 
 > [!TIP]
-> Check out quantum-caddy for a ready distribution.
+> Check out [quantum-caddy](https://github.com/hostwithquantum/quantum-caddy) for a ready distribution.
 
 - lists every vhost from the running config, with listen addresses and reverse proxy upstreams
 - per-host request counts, error rates and latency from Caddy's metrics
