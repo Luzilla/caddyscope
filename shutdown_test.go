@@ -68,7 +68,7 @@ func TestRegisterShutdownHook_ClosesStoppingOnServerShutdown(t *testing.T) {
 	requireOpen(t, cs.stopping, "stopping closed before server shutdown")
 
 	// Begin shutdown; the hook must close stopping.
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 2*time.Second)
 	defer cancel()
 	require.NoError(t, srv.Config.Shutdown(ctx), "server shutdown")
 
@@ -104,7 +104,7 @@ func TestRegisterShutdownHook_MultipleServers(t *testing.T) {
 
 	// Shut down only the SECOND server. Before the per-server fix, only the
 	// first server ever got a hook, so this would leave stopping open.
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 2*time.Second)
 	defer cancel()
 	require.NoError(t, srvB.Config.Shutdown(ctx), "server shutdown")
 
@@ -137,7 +137,7 @@ func TestServeHTTP_RegistersShutdownHook(t *testing.T) {
 	_ = resp.Body.Close()
 	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 2*time.Second)
 	defer cancel()
 	require.NoError(t, srv.Config.Shutdown(ctx), "server shutdown")
 
